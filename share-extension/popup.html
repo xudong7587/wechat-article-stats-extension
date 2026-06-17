@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>公众号文章数据助手</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <strong>公众号文章数据助手</strong>
+        <span>分享版</span>
+      </div>
+      <button id="openSettings" class="icon-button settings-button" type="button" title="工具设置"><span class="gear-icon"></span>工具设置</button>
+    </header>
+
+    <section class="status-card">
+      <div id="statusTitle" class="status-title">运行状态</div>
+      <div id="message" class="status-window">等待操作...</div>
+    </section>
+
+    <section class="card">
+      <h2>公众号数据获取</h2>
+      <div class="grid">
+        <label>开始日期<input id="start" type="date"></label>
+        <label>结束日期<input id="end" type="date"></label>
+      </div>
+      <button id="fetchArticle" class="primary">获取公众号数据</button>
+    </section>
+  </main>
+  <script src="common.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

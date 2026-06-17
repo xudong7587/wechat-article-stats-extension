@@ -1,0 +1,192 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 380px;
+  margin: 0;
+  font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+  color: #1f2329;
+  background: #f4f6f8;
+}
+
+body.settings-page {
+  width: auto;
+  min-width: 760px;
+}
+
+main {
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.settings-main {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+header div {
+  display: grid;
+  gap: 4px;
+}
+
+header strong {
+  font-size: 16px;
+}
+
+header span,
+label,
+.subtle {
+  color: #646a73;
+  font-size: 12px;
+}
+
+.card,
+.status-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #dfe3e8;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.settings-main .card,
+.settings-main .status-card {
+  padding: 18px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-weight: 650;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid #dfe3e8;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 13px;
+  color: #1f2329;
+  background: white;
+}
+
+button {
+  min-height: 36px;
+  border: 1px solid #dfe3e8;
+  border-radius: 6px;
+  background: white;
+  color: #1f2329;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+button.primary {
+  background: #13795b;
+  color: white;
+  border-color: #13795b;
+}
+
+.icon-button {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.settings-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.gear-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 13px;
+  height: 13px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.gear-icon::before {
+  content: "⚙";
+}
+
+.status-title {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.status-window {
+  min-height: 72px;
+  max-height: 180px;
+  overflow: auto;
+  white-space: pre-wrap;
+  border-radius: 6px;
+  padding: 10px;
+  background: #18212f;
+  color: #f2f6fb;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.field-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 14px;
+}
+
+.field-picker label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #1f2329;
+  font-weight: 500;
+}
+
+.field-picker input {
+  width: auto;
+  min-height: auto;
+}
+
+.order-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: 12px;
+}
+
+.order-actions {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.subtle {
+  margin: 0;
+  line-height: 1.6;
+}
