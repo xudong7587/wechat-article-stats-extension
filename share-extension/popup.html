@@ -22,12 +22,20 @@
     </section>
 
     <section class="card">
-      <h2>公众号数据获取</h2>
+      <h2>日期与数据</h2>
       <div class="grid">
         <label>开始日期<input id="start" type="date"></label>
         <label>结束日期<input id="end" type="date"></label>
       </div>
-      <button id="fetchArticle" class="primary">获取公众号数据</button>
+      <label>视频号 CSV（可选）
+        <input id="videoCsv" type="file" accept=".csv,text/csv">
+      </label>
+      <div class="actions">
+        <button id="fetchArticle" class="primary">仅公众号数据</button>
+        <button id="exportVideoOnly">仅视频号数据</button>
+        <button id="exportAll" class="primary">一键统计全部数据</button>
+      </div>
+      <p class="subtle">涉及视频号的数据需要先到视频号数据中心的单篇数据页面设置日期范围，并下载“视频号动态数据明细.csv”，再在这里选择该 CSV。</p>
     </section>
   </main>
   <script src="common.js"></script>

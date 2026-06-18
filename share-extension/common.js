@@ -13,8 +13,8 @@ const FIELD_LABELS = {
   source_type: "来源",
   stat_date: "统计截至日期",
   content_url: "文章链接",
-  read_user: "阅读数",
-  like_user: "点赞",
+  read_user: "阅读/播放数",
+  like_user: "点赞/推荐",
   share_user: "转发",
   zaikan_user: "喜欢",
   comment_count: "留言/评论",
@@ -46,6 +46,75 @@ function defaultSettings() {
     rowMode: "latest",
     selectedFields: DEFAULT_FIELDS.slice()
   };
+}
+
+function parseCsvLine(line) {
+  const result = [];
+  let current = "";
+  let quoted = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    const next = line[index + 1];
+    if (char === '"' && quoted && next === '"') {
+      current += '"';
+      index += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      result.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+function parseCsv(text) {
+  const lines = String(text || "").replace(/^\uFEFF/, "").split(/\r?\n/).filter(line => line.trim());
+  if (!lines.length) return [];
+  const headers = parseCsvLine(lines[0]).map(item => item.trim());
+  return lines.slice(1).map(line => {
+    const values = parseCsvLine(line);
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index] ?? "";
+    });
+    return row;
+  });
+}
+
+function parseVideoDate(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const match = text.match(/(20\d{2})[/-](\d{1,2})[/-](\d{1,2})/);
+  if (!match) return text.replace(/\//g, "-").slice(0, 10);
+  return `${match[1]}-${String(match[2]).padStart(2, "0")}-${String(match[3]).padStart(2, "0")}`;
+}
+
+function normalizeVideoRows(rows, start, end) {
+  return rows.map(raw => ({
+    source_type: "视频号",
+    ref_date: parseVideoDate(raw["发布时间"]),
+    stat_date: parseVideoDate(raw["发布时间"]),
+    title: String(raw["视频描述"] || "").trim(),
+    content_url: String(raw["视频ID"] || "").trim(),
+    read_user: String(raw["播放量"] || "").trim(),
+    like_user: String(raw["推荐"] || "").trim(),
+    share_user: String(raw["分享量"] || "").trim(),
+    zaikan_user: String(raw["喜欢"] || "").trim(),
+    comment_count: String(raw["评论量"] || "").trim(),
+    collection_user: "",
+    read_finish_rate: String(raw["完播率"] || "").trim(),
+    read_avg_activetime: String(raw["平均播放时长"] || "").trim(),
+    read_subscribe_user: String(raw["关注量"] || "").trim()
+  })).filter(row => {
+    if (!row.title || !row.ref_date) return false;
+    if (start && row.ref_date < start) return false;
+    if (end && row.ref_date > end) return false;
+    return true;
+  });
 }
 
 async function getStored(keys) {

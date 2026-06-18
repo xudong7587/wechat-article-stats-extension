@@ -37,7 +37,39 @@ async function init() {
   $("start").max = formatDate(yesterday);
 }
 
-async function fetchArticles() {
+async function readVideoRows(start, end) {
+  const file = $("videoCsv").files?.[0];
+  if (!file) throw new Error("请先选择视频号动态数据明细 CSV。");
+  const text = await file.text();
+  const rows = normalizeVideoRows(parseCsv(text), start, end);
+  if (!rows.length) throw new Error("视频号 CSV 中没有匹配当前日期范围的数据。");
+  return rows;
+}
+
+async function fetchArticleRows(settings, start, end) {
+  const days = dateRange(start, end);
+  appendMessage(`公众号日期范围：${start} 到 ${end}`);
+
+  let rows = [];
+  for (const day of days) {
+    appendMessage(`正在拉取公众号 ${day} ...`);
+    const data = await datacube(settings, settings.mode, day);
+    const dayRows = settings.mode === "totaldetail" ? flattenTotaldetail(data) : flattenLegacy(settings.mode, data);
+    rows = rows.concat(dayRows);
+    appendMessage(`${day} 完成：${dayRows.length} 行。`);
+  }
+  return sortRows(settings.rowMode === "daily" ? rows : latestRowsByArticle(rows));
+}
+
+async function exportRows(rows, fields, filename) {
+  const finalRows = sortRows(rows);
+  const csv = makeCsv(finalRows, fields);
+  await downloadCsv(filename, csv);
+  appendMessage(`导出完成：${filename}`);
+  appendMessage(`导出行数：${finalRows.length}`);
+}
+
+async function runExport(mode) {
   setRunning(true);
   setMessage("正在读取设置...");
   try {
@@ -47,24 +79,25 @@ async function fetchArticles() {
 
     const start = $("start").value;
     const end = $("end").value;
-    const days = dateRange(start, end);
-    appendMessage(`日期范围：${start} 到 ${end}`);
+    dateRange(start, end);
 
-    let rows = [];
-    for (const day of days) {
-      appendMessage(`正在拉取 ${day} ...`);
-      const data = await datacube(settings, settings.mode, day);
-      const dayRows = settings.mode === "totaldetail" ? flattenTotaldetail(data) : flattenLegacy(settings.mode, data);
-      rows = rows.concat(dayRows);
-      appendMessage(`${day} 完成：${dayRows.length} 行。`);
+    if (mode === "article") {
+      const articleRows = await fetchArticleRows(settings, start, end);
+      await exportRows(articleRows, fields, `wechat_articles_selected_${start}_${end}.csv`);
+      return;
     }
 
-    const finalRows = sortRows(settings.rowMode === "daily" ? rows : latestRowsByArticle(rows));
-    const csv = makeCsv(finalRows, fields);
-    const filename = `wechat_articles_selected_${start}_${end}.csv`;
-    await downloadCsv(filename, csv);
-    appendMessage(`导出完成：${filename}`);
-    appendMessage(`导出行数：${finalRows.length}`);
+    if (mode === "video") {
+      appendMessage("正在读取视频号 CSV ...");
+      const videoRows = await readVideoRows(start, end);
+      await exportRows(videoRows, fields, `wechat_channels_selected_${start}_${end}.csv`);
+      return;
+    }
+
+    appendMessage("正在读取视频号 CSV ...");
+    const videoRows = await readVideoRows(start, end);
+    const articleRows = await fetchArticleRows(settings, start, end);
+    await exportRows(articleRows.concat(videoRows), fields, `wechat_articles_channels_selected_${start}_${end}.csv`);
   } catch (error) {
     setMessage(`失败：${error.message}`);
   } finally {
@@ -73,6 +106,8 @@ async function fetchArticles() {
 }
 
 $("openSettings").addEventListener("click", () => chrome.runtime.openOptionsPage());
-$("fetchArticle").addEventListener("click", fetchArticles);
+$("fetchArticle").addEventListener("click", () => runExport("article"));
+$("exportVideoOnly").addEventListener("click", () => runExport("video"));
+$("exportAll").addEventListener("click", () => runExport("all"));
 
 init().catch(error => setMessage(error.message));
