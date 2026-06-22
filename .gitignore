@@ -1,9 +1,9 @@
-﻿.env
-.gui_settings.json
-.cache/
-logs/
-exports/
-__pycache__/
-备份/
+.DS_Store
+Thumbs.db
 *.log
-*.pyc
+.env
+*.crx
+*.pem
+*.zip
+*.csv
+*.xlsx

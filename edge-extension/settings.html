@@ -4,81 +4,65 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>工具设置</title>
-  <link rel="stylesheet" href="settings.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <main>
+<body class="settings-page">
+  <main class="settings-main">
     <header>
       <div>
         <strong>工具设置</strong>
-        <span>公众号数据助手 - 自用版</span>
+        <span>公众号文章数据助手 - 分享版</span>
       </div>
-      <button id="saveAll" class="primary" type="button">保存设置</button>
+      <button id="saveSettings" class="primary">保存设置</button>
     </header>
+
+    <section class="card">
+      <h2>密钥</h2>
+      <div class="grid">
+        <label>AppID<input id="appid" type="text" placeholder="请输入公众号 AppID"></label>
+        <label>AppSecret<input id="appsecret" type="password" placeholder="请输入公众号 AppSecret"></label>
+      </div>
+      <p class="subtle">密钥只保存在当前浏览器的插件存储里。分享插件时不会包含你的密钥。</p>
+    </section>
+
+    <section class="card">
+      <h2>导出设置</h2>
+      <div class="grid">
+        <label>数据接口
+          <select id="mode">
+            <option value="totaldetail">新接口：发表内容详细数据（推荐）</option>
+            <option value="legacy-summary">旧接口：图文群发每日数据</option>
+            <option value="legacy-total">旧接口：图文群发总数据</option>
+          </select>
+        </label>
+        <label>运营简表口径
+          <select id="rowMode">
+            <option value="latest">每篇文章一行：取最后统计日累计值</option>
+            <option value="daily">保留每日累计明细</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>字段与列顺序</h2>
+      <div id="fieldPicker" class="field-picker"></div>
+      <div class="order-panel">
+        <select id="fieldOrder" size="9"></select>
+        <div class="order-actions">
+          <button id="moveUp" type="button">上移</button>
+          <button id="moveDown" type="button">下移</button>
+          <button id="resetFields" type="button">恢复默认</button>
+        </div>
+      </div>
+    </section>
 
     <section class="status-card">
       <div class="status-title">保存状态</div>
-      <div id="message" class="status-window">正在读取本地工具...</div>
-    </section>
-
-    <section class="layout">
-      <div class="left-column">
-        <section class="card">
-          <h2>导出设置</h2>
-          <label>默认导出路径
-            <div class="path-row">
-              <input id="exportDir" type="text" placeholder="例如：D:\公众号数据导出\data">
-              <button id="pickExportDir" class="folder-button" type="button" title="选择文件夹">📁</button>
-            </div>
-          </label>
-          <div class="grid">
-            <label>数据接口
-              <select id="mode">
-                <option value="totaldetail">新接口：发表内容详细数据（推荐）</option>
-                <option value="legacy-summary">旧接口：图文群发每日数据</option>
-                <option value="legacy-total">旧接口：图文群发总数据</option>
-              </select>
-            </label>
-            <label>运营简表口径
-              <select id="rowMode">
-                <option value="latest">每篇文章一行：取最后统计日累计值</option>
-                <option value="daily">保留每日累计明细</option>
-              </select>
-            </label>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2>字段与列顺序</h2>
-          <div id="fieldPicker" class="field-picker"></div>
-          <div class="order-panel">
-            <select id="fieldOrder" size="10"></select>
-            <div class="order-actions">
-              <button id="moveUp" type="button">上移</button>
-              <button id="moveDown" type="button">下移</button>
-              <button id="resetFields" type="button">恢复默认</button>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <div class="right-column">
-        <section class="card">
-          <h2>密钥设置</h2>
-          <div class="grid single">
-            <label>AppID<input id="appid" type="text" placeholder="请输入公众号 AppID"></label>
-            <label>AppSecret<input id="appsecret" type="password" placeholder="请输入公众号 AppSecret"></label>
-          </div>
-          <p class="subtle">密钥只写入本机的本地工具配置，不会放进插件文件夹。重新移动项目后需要重新填写一次。</p>
-        </section>
-
-        <section class="card">
-          <h2>地域战报</h2>
-          <p class="subtle">地域战报仍使用插件弹窗里的日期、下载与生成按钮。这里暂时只保留说明，避免低频设置占用主流程。</p>
-        </section>
-      </div>
+      <div id="message" class="status-window">等待保存...</div>
     </section>
   </main>
+  <script src="common.js"></script>
   <script src="settings.js"></script>
 </body>
 </html>

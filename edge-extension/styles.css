@@ -1,26 +1,37 @@
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
+  width: 380px;
   margin: 0;
-  min-width: 860px;
   font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
   color: #1f2329;
   background: #f4f6f8;
 }
 
+body.settings-page {
+  width: auto;
+  min-width: 760px;
+}
+
 main {
-  max-width: 1040px;
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.settings-main {
+  max-width: 920px;
   margin: 0 auto;
   padding: 24px;
-  display: grid;
-  gap: 14px;
 }
 
 header {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 header div {
@@ -28,73 +39,35 @@ header div {
   gap: 4px;
 }
 
-header strong { font-size: 18px; }
-header span, label, .subtle { color: #646a73; font-size: 12px; }
-
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(280px, .75fr);
-  gap: 14px;
-  align-items: stretch;
+header strong {
+  font-size: 16px;
 }
 
-.left-column, .right-column {
-  display: grid;
-  gap: 14px;
+header span,
+label,
+.subtle {
+  color: #646a73;
+  font-size: 12px;
 }
 
-.right-column {
-  grid-template-rows: 1fr 1fr;
-}
-
-.card, .status-card {
+.card,
+.status-card {
   display: grid;
-  gap: 12px;
-  padding: 16px;
+  gap: 10px;
+  padding: 12px;
   border: 1px solid #dfe3e8;
   border-radius: 8px;
-  background: #fff;
+  background: #ffffff;
+}
+
+.settings-main .card,
+.settings-main .status-card {
+  padding: 18px;
 }
 
 h2 {
   margin: 0;
   font-size: 15px;
-}
-
-label {
-  display: grid;
-  gap: 6px;
-  font-weight: 650;
-}
-
-input, select {
-  width: 100%;
-  min-height: 36px;
-  border: 1px solid #dfe3e8;
-  border-radius: 6px;
-  padding: 6px 8px;
-  font: inherit;
-  font-size: 13px;
-  color: #1f2329;
-  background: #fff;
-}
-
-button {
-  min-height: 36px;
-  border: 1px solid #dfe3e8;
-  border-radius: 6px;
-  background: #fff;
-  color: #1f2329;
-  font: inherit;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-button.primary {
-  min-width: 110px;
-  background: #13795b;
-  color: #fff;
-  border-color: #13795b;
 }
 
 .grid {
@@ -103,20 +76,71 @@ button.primary {
   gap: 12px;
 }
 
-.grid.single {
-  grid-template-columns: 1fr;
-}
-
-.path-row {
+.actions {
   display: grid;
-  grid-template-columns: 1fr 38px;
-  gap: 6px;
+  grid-template-columns: 1fr;
+  gap: 8px;
 }
 
-.folder-button {
+label {
+  display: grid;
+  gap: 6px;
+  font-weight: 650;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid #dfe3e8;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 13px;
+  color: #1f2329;
+  background: white;
+}
+
+button {
   min-height: 36px;
-  padding: 0;
-  font-size: 16px;
+  border: 1px solid #dfe3e8;
+  border-radius: 6px;
+  background: white;
+  color: #1f2329;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+button.primary {
+  background: #13795b;
+  color: white;
+  border-color: #13795b;
+}
+
+.icon-button {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.settings-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.gear-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 13px;
+  height: 13px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.gear-icon::before {
+  content: "⚙";
 }
 
 .status-title {
@@ -125,7 +149,8 @@ button.primary {
 }
 
 .status-window {
-  height: 88px;
+  min-height: 72px;
+  max-height: 180px;
   overflow: auto;
   white-space: pre-wrap;
   border-radius: 6px;
@@ -170,11 +195,4 @@ button.primary {
 .subtle {
   margin: 0;
   line-height: 1.6;
-}
-
-@media (max-width: 900px) {
-  body { min-width: 0; }
-  .layout, .grid, .grid.single { grid-template-columns: 1fr; }
-  .right-column { grid-template-rows: auto; }
-  .field-picker { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
