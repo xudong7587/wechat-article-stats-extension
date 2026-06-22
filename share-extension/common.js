@@ -35,6 +35,16 @@ const DEFAULT_FIELDS = [
   "comment_count"
 ];
 
+const NUMERIC_FIELDS = new Set([
+  "read_user",
+  "like_user",
+  "share_user",
+  "zaikan_user",
+  "comment_count",
+  "collection_user",
+  "read_subscribe_user"
+]);
+
 const SETTINGS_KEY = "sharePluginSettings";
 const TOKEN_KEY = "sharePluginToken";
 
@@ -115,6 +125,16 @@ function normalizeVideoRows(rows, start, end) {
     if (end && row.ref_date > end) return false;
     return true;
   });
+}
+
+function cleanNumber(value) {
+  if (value === null || value === undefined || value === "") return "";
+  if (typeof value === "number") return Number.isInteger(value) ? String(value) : String(value);
+  const text = String(value).trim().replace(/,/g, "");
+  if (!text) return "";
+  const number = Number(text);
+  if (!Number.isFinite(number)) return value;
+  return Number.isInteger(number) ? String(number) : String(number);
 }
 
 async function getStored(keys) {
@@ -317,7 +337,7 @@ function csvEscape(value) {
 
 function makeCsv(rows, fields) {
   const header = fields.map(field => FIELD_LABELS[field] || field).map(csvEscape).join(",");
-  const lines = rows.map(row => fields.map(field => csvEscape(row[field])).join(","));
+  const lines = rows.map(row => fields.map(field => csvEscape(NUMERIC_FIELDS.has(field) ? cleanNumber(row[field]) : row[field])).join(","));
   return `\uFEFF${[header, ...lines].join("\r\n")}`;
 }
 

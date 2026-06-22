@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "公众号文章数据助手",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "纯插件版公众号和视频号运营简表导出工具，不包含本地 Python 服务。",
   "permissions": [
     "downloads",
