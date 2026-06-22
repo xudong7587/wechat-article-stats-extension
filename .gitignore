@@ -1,10 +1,9 @@
-.DS_Store
-Thumbs.db
-*.pem
-*.crx
-*.zip
-.env
+﻿.env
+.gui_settings.json
 .cache/
+logs/
 exports/
 __pycache__/
-logs/
+备份/
+*.log
+*.pyc

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>公众号数据助手</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <strong>公众号数据助手</strong>
+        <span id="status">正在检测页面</span>
+      </div>
+      <div class="header-actions">
+        <button id="openSecrets" class="icon-button settings-button" type="button" title="打开工具设置"><span class="gear-icon"></span>工具设置</button>
+        <button id="checkLocal" class="icon-button" type="button" title="检查本地服务">检查本地服务</button>
+        <button id="stopTask" class="icon-button danger-button" type="button" title="停止当前任务">停止当前任务</button>
+        <button id="exportLog" class="icon-button" type="button" title="导出运行日志">导出日志</button>
+      </div>
+    </header>
+
+    <section class="status-card">
+      <div id="statusTitle" class="status-title">运行状态</div>
+      <div id="message" class="status-window">等待操作...</div>
+    </section>
+
+    <section class="card">
+      <h2>日期与导出</h2>
+      <div class="grid">
+        <label>开始日期<input id="articleStart" type="date"></label>
+        <label>结束日期<input id="articleEnd" type="date"></label>
+      </div>
+      <label>导出文件夹路径</label>
+      <div class="path-row">
+        <input id="articleOut" type="text" placeholder="例如：D:\导出数据">
+        <button id="pickArticleFolder" class="folder-button" type="button" title="选择文件夹">📁</button>
+      </div>
+      <div class="actions main-actions">
+        <button id="fetchArticle" class="primary">仅公众号数据</button>
+        <button id="downloadVideoOnly" class="primary">仅视频号数据</button>
+        <button id="downloadVideoAndCombine" class="primary">一键统计全部数据</button>
+        <button id="openArticleFolder">打开导出文件夹</button>
+      </div>
+      <p class="subtle">涉及视频号的数据会从已打开的视频号单篇数据页面自动下载最新 CSV。请先在视频号页面设置好日期范围，再点击“仅视频号数据”或“一键统计全部数据”。</p>
+    </section>
+
+    <section class="card">
+      <h2>地域战报</h2>
+      <label>地域 Excel 文件夹</label>
+      <div class="path-row">
+        <input id="regionFolder" type="text" placeholder="例如：D:\下载\公众号数据统计">
+        <button id="pickRegionFolder" class="folder-button" type="button" title="选择文件夹">📁</button>
+      </div>
+
+      <div class="grid">
+        <label>开始日期<input id="regionStart" type="date"></label>
+        <label>结束日期<input id="regionEnd" type="date"></label>
+      </div>
+
+      <label>战报文件名</label>
+      <input id="reportName" type="text">
+
+      <label>当前 token</label>
+      <input id="token" type="text" readonly placeholder="请先打开公众号后台">
+
+      <label>真实下载链接模板</label>
+      <input id="downloadTemplate" type="text" placeholder="可选：默认链接报错时粘贴真实下载链接">
+
+      <div class="actions region-actions">
+        <button id="downloadAndReport" class="primary">下载并生成战报</button>
+        <button id="downloadOnly">仅下载</button>
+        <button id="buildReport">仅生成战报</button>
+        <button id="openRegionFolder">打开文件夹</button>
+      </div>
+    </section>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

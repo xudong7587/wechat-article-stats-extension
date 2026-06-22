@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "公众号数据助手",
+  "version": "0.4.4",
+  "description": "在微信公众号和视频号后台辅助导出运营数据并连接本地统计工具。",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "downloads",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://mp.weixin.qq.com/*",
+    "https://channels.weixin.qq.com/*",
+    "http://127.0.0.1:8765/*"
+  ],
+  "action": {
+    "default_title": "公众号数据助手",
+    "default_popup": "popup.html"
+  },
+  "options_page": "settings.html",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mp.weixin.qq.com/*",
+        "https://channels.weixin.qq.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
