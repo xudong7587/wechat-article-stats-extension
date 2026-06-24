@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "公众号文章数据助手",
-  "version": "1.1.2",
-  "description": "纯插件版公众号和视频号运营简表导出工具，不包含本地服务和地域战报。",
+  "version": "1.2.0",
+  "description": "纯插件版公众号和视频号运营简表导出工具，不包含本地服务、地域战报和飞书同步。",
   "permissions": [
     "activeTab",
     "downloads",
