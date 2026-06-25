@@ -176,6 +176,25 @@ async function fetchArticleRows(settings, start, end) {
     rows = rows.concat(dayRows);
     appendMessage(`${day} 完成：${dayRows.length} 行。`);
   }
+  if (settings.mode === "totaldetail" && rows.length) {
+    appendMessage("正在补充公众号发布元数据并过滤已删除文章...");
+    try {
+      const metadata = await fetchPublishMetadata(settings, start, end);
+      if (metadata.size) {
+        rows = enrichRowsWithPublishMetadata(rows, metadata);
+        const deletedCount = rows.filter(row => row.is_deleted === true).length;
+        if (deletedCount) {
+          rows = rows.filter(row => row.is_deleted !== true);
+          appendMessage(`已剔除已删除公众号文章：${deletedCount} 行。`);
+        }
+        appendMessage(`发布元数据补充完成：${metadata.size} 条。`);
+      } else {
+        appendMessage("发布元数据未返回匹配记录，继续使用统计接口数据导出。");
+      }
+    } catch (error) {
+      appendMessage(`发布元数据补充失败，继续导出统计数据：${error.message}`);
+    }
+  }
   return sortRows(settings.rowMode === "daily" ? rows : latestRowsByArticle(rows));
 }
 

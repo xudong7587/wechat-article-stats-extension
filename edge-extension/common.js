@@ -1,5 +1,6 @@
 const API_BASE = "https://api.weixin.qq.com";
 const TOKEN_URL = `${API_BASE}/cgi-bin/stable_token`;
+const FREEPUBLISH_BATCHGET_URL = `${API_BASE}/cgi-bin/freepublish/batchget`;
 
 const ENDPOINTS = {
   "totaldetail": "/datacube/getarticletotaldetail",
@@ -13,6 +14,10 @@ const FIELD_LABELS = {
   source_type: "来源",
   stat_date: "统计截至日期",
   content_url: "文章链接",
+  publish_time: "发布时间",
+  article_position: "发布位置",
+  is_headline: "是否头条",
+  is_deleted: "是否已删除",
   read_user: "阅读/播放数",
   like_user: "点赞/推荐",
   share_user: "转发",
@@ -255,6 +260,101 @@ async function datacube(settings, mode, day, forceRefreshToken = false) {
   return data;
 }
 
+function msgKeyFromUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    const mid = url.searchParams.get("mid") || "";
+    const idx = url.searchParams.get("idx") || "1";
+    return mid ? `${mid}_${idx}` : "";
+  } catch {
+    return "";
+  }
+}
+
+function msgKeyFromRow(row) {
+  const msgid = String(row?.msgid || "").trim();
+  return msgid || msgKeyFromUrl(row?.content_url || "");
+}
+
+function publishTimeText(timestamp) {
+  const value = Number(timestamp);
+  if (!Number.isFinite(value) || value <= 0) return "";
+  const date = new Date(value * 1000);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  const hh = String(date.getHours()).padStart(2, "0");
+  const mm = String(date.getMinutes()).padStart(2, "0");
+  const ss = String(date.getSeconds()).padStart(2, "0");
+  return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+}
+
+async function freepublishBatchget(settings, offset, count, forceRefreshToken = false) {
+  let token = await getAccessToken(settings, forceRefreshToken);
+  const payload = {offset, count, no_content: 1};
+  let data = await postJson(`${FREEPUBLISH_BATCHGET_URL}?access_token=${encodeURIComponent(token)}`, payload);
+  if (data.errcode && data.errcode !== 0) {
+    if (data.errcode === 40001 && !forceRefreshToken) {
+      token = await getAccessToken(settings, true);
+      data = await postJson(`${FREEPUBLISH_BATCHGET_URL}?access_token=${encodeURIComponent(token)}`, payload);
+    }
+    if (data.errcode && data.errcode !== 0) throw new Error(wechatErrorMessage(data.errcode, data.errmsg || "", "/cgi-bin/freepublish/batchget"));
+  }
+  return data;
+}
+
+async function fetchPublishMetadata(settings, start, end) {
+  const result = new Map();
+  let offset = 0;
+  const count = 20;
+  while (true) {
+    const data = await freepublishBatchget(settings, offset, count);
+    const items = data.item || [];
+    if (!items.length) break;
+
+    let reachedOlder = false;
+    for (const item of items) {
+      const content = item.content || {};
+      const timestamp = item.update_time || content.update_time || content.create_time;
+      const publishTime = publishTimeText(timestamp);
+      const publishDate = publishTime.slice(0, 10);
+      if (publishDate) {
+        if (publishDate < start) {
+          reachedOlder = true;
+          continue;
+        }
+        if (publishDate > end) continue;
+      }
+
+      const newsItems = content.news_item || [];
+      newsItems.forEach((news, index) => {
+        const key = msgKeyFromUrl(news.url || "");
+        if (!key) return;
+        const rawIdx = key.split("_").pop();
+        const parsed = Number.parseInt(rawIdx, 10);
+        const articlePosition = Number.isFinite(parsed) ? parsed : index + 1;
+        result.set(key, {
+          publish_title: news.title || "",
+          publish_time: publishTime,
+          publish_date: publishDate,
+          article_position: articlePosition,
+          is_headline: articlePosition === 1,
+          is_deleted: Boolean(news.is_deleted)
+        });
+      });
+    }
+
+    offset += items.length;
+    const total = Number(data.total_count || 0);
+    if (reachedOlder || offset >= total || items.length < count) break;
+  }
+  return result;
+}
+
+function enrichRowsWithPublishMetadata(rows, metadata) {
+  return rows.map(row => ({...row, ...(metadata.get(msgKeyFromRow(row)) || {})}));
+}
+
 function centsToYuan(value) {
   if (value === "" || value === null || value === undefined) return "";
   const number = Number.parseInt(value, 10);
@@ -325,8 +425,16 @@ function latestRowsByArticle(rows) {
   return [...latest.values()];
 }
 
+function normalizeTitleForSort(value) {
+  return String(value || "").replace(/[|\uFF5C\s]+/g, "").trim();
+}
+
 function sortRows(rows) {
-  return rows.slice().sort((a, b) => String(a.ref_date || "").localeCompare(String(b.ref_date || "")) || String(a.title || "").localeCompare(String(b.title || ""), "zh-CN"));
+  return rows.slice().sort((a, b) => (
+    String(a.ref_date || "").localeCompare(String(b.ref_date || "")) ||
+    normalizeTitleForSort(a.title).localeCompare(normalizeTitleForSort(b.title), "zh-CN") ||
+    String(a.title || "").localeCompare(String(b.title || ""), "zh-CN")
+  ));
 }
 
 function csvEscape(value) {
